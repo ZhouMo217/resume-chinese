@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "name": "中文简历",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "latex-workshop.view.pdf.viewer": "tab"
+  }
+}

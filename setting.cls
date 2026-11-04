@@ -56,10 +56,13 @@
 ]{HelveticaNeueLTPro-Roman.otf}
 
 \setCJKmainfont[
-Path = Font/,
-  Extension = .ttf ,
-BoldFont=Pro_GB18030DemiBold.ttf,
-]{Pro_GB18030.ttf}
+  Path = Font/,
+  BoldFont = NotoSansCJKsc-Bold.otf,
+]{NotoSansCJKsc-Regular.otf}
+\setCJKsansfont[
+  Path = Font/,
+  BoldFont = NotoSansCJKsc-Bold.otf,
+]{NotoSansCJKsc-Regular.otf}
 
 
 \usepackage{relsize}
