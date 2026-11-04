@@ -1,0 +1,15 @@
+% !TeX root = resume.tex
+% Per the user's request, this draft copies only the JD internship section from
+% ../陈凯权_简历.pdf. The role, dates, responsibilities and metrics below follow
+% that reference and can be personalized in this file.
+
+\section{实习经历}
+\companyheading{assets/logos/jd-joy-rounded.pdf}{京东集团\,·\,京东科技}{算法开发}{2026.06 -- 至今}
+\projectheading{工具调用大模型训练与推理优化}{}
+\begin{itemize}[label=\textbullet,leftmargin=1.2em,itemsep=3pt,topsep=0pt]
+  \item \textbf{81B 工具调用模型全参微调：}基于定制 LLaMA-Factory，对内部 Llama 系稠密模型开展多机多卡全参数 SFT；采用 BF16、DeepSpeed ZeRO-3 参数／优化器 CPU Offload、FlashAttention 2 与梯度检查点，支持 16K 序列训练；通过 Neat Packing 与块对角注意力隔离打包样本，适配多工具调用、工具返回及最终回答模板。
+  \item \textbf{数据配比与 Chat／工具路由消融：}对比通用 FC、业务及长多轮混合数据，评估工具调用与无需调用工具的边界。通用 FC 训练使 Non-Live／Live 准确率分别由 68.77\%／50.56\% 提升至 \textbf{90.12\%／82.68\%}，同时识别不调用工具能力退化；通用与业务数据联合训练的业务评测平均准确率为 \textbf{93.23\%}，较仅业务数据的 91.13\% 提升 \textbf{2.10 个百分点}。
+  \item \textbf{MTP 后训练与推测解码：}冻结已微调的 81B 主模型，后挂单层 Llama Decoder 与特征融合层，复用冻结的词嵌入及输出头，训练轻量单步 Drafter，无需重训主模型。家居、万能博士、外卖场景下，MTP 单独相对原模型加速 \textbf{1.26--1.49 倍}，与 FP8 组合加速 \textbf{1.65--1.94 倍}；对比跨场景接受率，评估业务特化收益与泛化边界。
+  \item \textbf{智能家居工具调用数据体系：}针对中文数据稀缺与 Teacher 标签幻觉，对比开源数据及近 99.2 万条业务日志，制定“HA 运行时真值为主、开源增强、业务校准”的路线；以 25 套家庭拓扑、实体状态与真实执行结果构造标签，按设备能力暴露工具，将 Teacher 限定为生成用户表达，解耦语言多样性与调用标签正确性。
+  \item \textbf{数据规模化与可执行验证：}以确定性真值批量生成多种表达，结合 Qwen／GLM 双 Teacher、Schema 约束、语义去重及 64 路并发与失败恢复；完成多设备控制、查询及拒绝场景的中文增强和协议归一，通过静态规则、25 套 HA 环境运行时测试、分阶段模型审计与人工抽样，形成\textbf{约 9.8 万条}可用于 SFT 的数据（79,733 条核心数据、17,856 条增强数据）。
+\end{itemize}

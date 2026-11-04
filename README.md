@@ -22,6 +22,30 @@ LaTex语法内容以及框架基本上参照[Htallone/myCV](https://github.com/H
 0. 直接使用[Overleaf模板](https://www.overleaf.com/latex/templates/resume-chinese/vbrmnfrgbscv), 开始你的编辑
 
 
+### 服务器上的编辑与预览
+
+服务器需要有 `xelatex`、`latexmk`，以及模板用到的 `xeCJK`、`fontawesome` 等 TeX 宏包。
+
+当前 `jx_dev_test` 已在 `/mnt/workspace/data/jiangxu/.vscode/settings.json` 配置了 LaTeX Workshop，可以继续使用现有的 `jiangxu` 工作区，无需切换目录。
+
+1. 在现有工作区打开 `latex/resume-chinese/resume.tex`。如果希望单独打开简历项目，也可以打开 `resume.code-workspace`，或直接打开 `resume-chinese` 文件夹。
+2. 打开 `resume.tex`，执行命令 **LaTeX Workshop: Build LaTeX project**。
+3. 执行 **LaTeX Workshop: View LaTeX PDF file**，在编辑器内查看 PDF。
+4. 修改 `body.tex` 中的正文并保存；插件检测到文件变化后，会使用 XeLaTeX 自动编译并刷新预览。
+
+姓名和联系方式在 `resume.tex` 中。照片版请打开 `resume-photo.tex` 后再构建。
+新生成的 PDF 位于 `build/resume.pdf` 或 `build/resume-photo.pdf`；项目根目录原有的 PDF 是模板示例。
+`.gitignore` 已忽略 `build/` 中的编译产物。
+
+也可以在项目目录使用终端编译，`.latexmkrc` 会选择 XeLaTeX 和 `build/` 输出目录：
+
+```sh
+latexmk resume.tex
+latexmk resume-photo.tex
+```
+
+如果 AI 从共享挂载目录修改文件，而编辑器没有收到文件变化事件，可在服务器终端运行 `latexmk -pvc -view=none resume.tex`，让 latexmk 持续检查源码变化；按 `Ctrl+C` 停止。
+
 ###  宏(newcommand)
 
 - `\name`: 姓名
@@ -52,3 +76,9 @@ LaTex语法内容以及框架基本上参照[Htallone/myCV](https://github.com/H
 页脚个人信息:
 
 ![footer](https://zheyuye-image-1257819557.cos.ap-shanghai.myqcloud.com/img/image-20210408152718217.png)
+
+### 当前简历字体与版式
+
+中文采用 Noto Sans CJK SC，常规与粗体字库已放入 Font/，英文与数字使用 Helvetica Neue。字体设置位于 setting.cls，正文为 10.5pt、行距 14.2pt；更换编译机器不需要另装这两份中文字库。Noto 字体许可见 Font/Noto-COPYRIGHT.txt。
+
+教育背景沿用原版的两行学历与缩进双学位布局，日期右对齐，课程两行对齐。项目标题统一使用北大红，邮箱显示黑色并保留邮件链接。京东实习文字在 internship.tex，项目标题可直接修改。
