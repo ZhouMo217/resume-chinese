@@ -1,4 +1,4 @@
-% !TeX program = xelatex
+% Build with the configured latexmk (xelatex) recipe; output: build/.
 \RequirePackage{fix-cm}
 \documentclass{setting}
 
@@ -9,7 +9,7 @@
 \definecolor{SecondaryText}{HTML}{555555}
 \colorlet{ICBlue}{PKURed}
 % Reserve bottom space for the footer on every page.
-\geometry{left=1.1cm,right=1.1cm,top=0.9cm,bottom=1.25cm}
+\geometry{left=1.1cm,right=1.1cm,top=0.7cm,bottom=1.25cm}
 \renewcommand{\baselinestretch}{1}
 \hypersetup{
   pdftitle={蒋旭个人简历},
@@ -19,18 +19,30 @@
   citecolor=PKURed
 }
 \titleformat{\section}{\fontsize{12}{14}\selectfont\bfseries\color{PKURed}}{}{0pt}{}[\color{PKURed}\titlerule]
-\titlespacing*{\section}{0pt}{8pt}{5pt}
-\setlist[enumerate,1]{label=\arabic*.,leftmargin=1.45em,labelsep=0.35em,topsep=2pt,itemsep=1.5pt,parsep=0pt,partopsep=0pt}
-\setlist[itemize,1]{label=--,leftmargin=0.95em,labelsep=0.3em,topsep=1pt,itemsep=0.5pt,parsep=0pt,partopsep=0pt}
+\titlespacing*{\section}{0pt}{9pt}{5pt}
+% Content-driven pagination: reserve heading space but do not fix page counts.
+\AddToHook{cmd/section/before}{\par\Needspace{6\baselineskip}}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\raggedbottom
+\newcommand{\draftnote}[1]{\par{\color{SecondaryText}\fontsize{9}{12}\selectfont #1\par}\vspace{3pt}}
+\setlist[enumerate,1]{label=\arabic*.,leftmargin=1.45em,labelsep=0.35em,topsep=3pt,itemsep=4pt,parsep=0pt,partopsep=0pt}
+\setlist[itemize,1]{label=--,leftmargin=0.95em,labelsep=0.3em,topsep=2pt,itemsep=1.5pt,parsep=0pt,partopsep=0pt}
+\newenvironment{experienceitems}{%
+  \begin{itemize}[label=\textbullet,leftmargin=1.2em,labelsep=0.35em,itemsep=3.5pt,topsep=1pt,parsep=0pt,partopsep=0pt]
+}{\end{itemize}}
+\newcommand{\resumedate}[1]{{\normalfont\color{SecondaryText}#1}}
+\newcommand{\resumedaterange}[2]{\resumedate{#1\,--\,#2}}
 \setlength{\emergencystretch}{1.5em}
 \newcommand{\projectheading}[2]{%
   \par\Needspace{4\baselineskip}\noindent
-  {\bfseries\color{PKURed}#1}\hfill{\color{SecondaryText}#2}\par\nobreak\vspace{2pt}%
+  {\bfseries\color{PKURed}#1}\hfill\resumedate{#2}\par\nobreak\vspace{1pt}%
 }
 \definecolor{JDLight}{HTML}{FFF1F0}
 \newcommand{\schoollogofile}{assets/logos/pku-horizontal.png}
-\newcommand{\companyheading}[4]{%
-  \par\vspace{2pt}\noindent
+\newcommand{\companyheading}[3]{%
+  \par\Needspace{8\baselineskip}\vspace{2pt}\noindent
   \begin{tikzpicture}
     \node[
       fill=JDLight,rounded corners=3pt,
@@ -39,7 +51,7 @@
     ] (companybar) {%
       \raisebox{-.35\height}{\includegraphics[height=8.5mm]{#1}}%
       \hspace{6pt}{\bfseries #2}%
-      \hfill{\bfseries #3\quad\textnormal{|}\quad #4}%
+      \hfill{\bfseries #3}%
     };
     \begin{scope}
       \clip[rounded corners=3pt]
@@ -59,7 +71,7 @@
 
 \begin{tikzpicture}[remember picture,overlay]
   \node[anchor=north west,inner sep=0pt]
-    at ([xshift=1.1cm,yshift=-0.9cm]current page.north west)
+    at ([xshift=1.1cm,yshift=-0.7cm]current page.north west)
     {\includegraphics[width=4.4cm]{\schoollogofile}};
 \end{tikzpicture}%
 \noindent
@@ -68,8 +80,8 @@
 \end{minipage}\hfill
 \begin{minipage}[c][2.5cm][c]{\dimexpr\linewidth-4.8cm\relax}
   \centering
-  {\fontsize{20}{24}\selectfont\bfseries 蒋旭\par}
-  \vspace{5pt}
+  {\fontsize{18}{22}\selectfont\bfseries 蒋旭\par}
+  \vspace{4pt}
   23岁\quad 男\quad 安徽宿州\par
   \vspace{3pt}
   15705575292\quad
@@ -79,5 +91,6 @@
   \includegraphics[width=\linewidth]{portrait-jiangxu-white.png}
 \end{minipage}
 
+\vspace{-4pt}
 \input{body}
 \end{document}

@@ -10,11 +10,11 @@
   \begin{tikzpicture}[remember picture,overlay]
     \fill[PKURed]
       (current page.south west)
-      rectangle ([yshift=7.5mm]current page.south east);
+      rectangle ([yshift=6mm]current page.south east);
     \node[
       anchor=center,inner sep=0pt,text=white,
       font=\fontsize{9}{11}\selectfont
-    ] at ([yshift=3.75mm]current page.south) {%
+    ] at ([yshift=3mm]current page.south) {%
       \faGithub\hspace{4pt}\footerprofile{\githuburl}%
       \qquad\textcolor{white}{|}\qquad
       \raisebox{-.25\height}{\includegraphics[height=3.5mm]{assets/logos/huggingface-white.pdf}}%
