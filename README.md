@@ -62,20 +62,13 @@ latexmk resume-photo.tex
 
 ### 效果示例
 
-**纯享版:**
+**第一页:**
 
-![resume](https://zheyuye-image-1257819557.cos.ap-shanghai.myqcloud.com/img/resume.png)
+![resume-page1](assets/preview/resume-1.png)
 
+**第二页:**
 
-**照片版:**
-
-页眉个人照片+学校logo:
-
-![head](https://zheyuye-image-1257819557.cos.ap-shanghai.myqcloud.com/img/image-20210408152658206.png)
-
-页脚个人信息:
-
-![footer](https://zheyuye-image-1257819557.cos.ap-shanghai.myqcloud.com/img/image-20210408152718217.png)
+![resume-page2](assets/preview/resume-2.png)
 
 ### 当前简历字体与版式
 
