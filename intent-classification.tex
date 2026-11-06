@@ -1,0 +1,12 @@
+% !TeX root = resume.tex
+% Confirmed: intent classification optimization; JEV investigation; prompt self-evolution.
+% JEV expansion, training setup and evaluation results were not supplied.
+% Candidate implementation details below are visibly labeled as draft proposals.
+
+\projectheading{意图分类模型优化与提示词自进化}{2026.10\,--\,2026.11}
+\begin{experienceitems}
+  \item \textbf{意图分类研究：}围绕业务意图识别任务开展模型优化，研究使用 JEV 进行意图分类，并探索在该方案上通过提示词自进化改善分类效果。
+  \item \textbf{优化流程草稿：}拟按“错误样本归类--提示词候选生成--固定验证集评估--保留有效版本”组织迭代，重点检查相近意图混淆、表达变化及类别边界；以独立测试集核验效果，避免只对少量案例调优。
+  \item \textbf{对照评测草稿：}拟对比初始提示词、人工调整与自动进化方案，记录准确率、Macro-F1、易混类别召回率及推理开销，评估分类收益和使用成本。
+\end{experienceitems}
+\draftnote{待确认：JEV 全称／模型版本、上述流程的已完成部分；待补充：数据量、基线与最终指标。}

@@ -1,63 +1,25 @@
-% Source: ../蒋旭个人简历202606(1).pdf
-% Personal details, dates, experiment settings and results follow the source PDF.
+% !TeX root = resume.tex
+% Education and courses retain the user edits; experience content is split into separate files.
 
 \section{教育背景}
 \begingroup
-\fontsize{10}{14}\selectfont
-\noindent\begin{tabularx}{\linewidth}{@{}X r@{}}
-  \textbf{北京大学} -- 软件与微电子学院 -- 电子信息 -- 硕士研究生（保研） &
-  {\color{SecondaryText}2025-09 $\sim$ 2028-06}\\[2pt]
-  \textbf{北京大学} -- 信息科学技术学院 -- 应用物理 -- 本科 &
-  {\color{SecondaryText}2021-09 $\sim$ 2025-06}\\[1pt]
-  \hspace*{4.8em}国家发展研究院 -- 经济学双学位 &
-\end{tabularx}\par
+\fontsize{10.5}{14.2}\selectfont
+\setlength{\tabcolsep}{0pt}
+\noindent\begin{tabular*}{\linewidth}{@{}l@{\hspace{0.4em}}l@{\hspace{0.4em}}l@{\hspace{0.4em}}l@{\extracolsep{\fill}}r@{}}
+  \textbf{北京大学} &
+  -- 软件与微电子学院 & -- 电子信息 & -- 硕士研究生（保研） &
+  \resumedaterange{2025.09}{2028.06}\\[2pt]
+  \textbf{北京大学} &
+  -- 信息科学技术学院 & -- 应用物理 & -- 本科 &
+  \resumedaterange{2021.09}{2025.06}\\[1pt]
+  & \multicolumn{3}{l}{\phantom{-- }国家发展研究院 -- 经济学 -- 双学位} &\\[3pt]
+  \textbf{主修课程} & \multicolumn{4}{l@{}}{\phantom{-- }算法分析与设计；自然语言处理；数据结构与算法；大语言模型后训练实践；数字图像处理}
+\end{tabular*}\par
 \endgroup
-\vspace{3pt}
-\noindent\begin{tabularx}{\linewidth}{@{}l @{\hspace{0.65em}} X@{}}
-  \textbf{主修课程} &
-  算法分析与设计；自然语言处理；数据结构与算法；大语言模型后训练实践；数字图像处理
-\end{tabularx}
 
 \input{internship}
 
 \section{项目经历}
-\projectheading{基于 PyTorch 实现的轻量级大语言模型复现与训练}{2026-03 $\sim$ 2026-04}
-\textbf{项目介绍：}为深入研究 LLM 内部原理和机制，纯 PyTorch 复现了 Decoder-Only 架构的轻量级语言模型，涵盖 Pretrain、Full SFT、LoRA SFT、DPO 训练阶段。\par
-\textbf{项目工作：}
-\begin{enumerate}
-  \item \textbf{纯 PyTorch 从零实现 Decoder-Only Transformer：}配置 d\_model=768、n\_layer=8、GQA(q=8, kv=4)、YaRN + RoPE、MoE 架构（4 experts / Top-1 路由 + 负载均衡 Loss）、Pre-Norm + RMSNorm、SwiGLU 激活、vocab=6400，参数量 198M-A64M。
-  \item \textbf{完成四阶段训练链路：}Pretrain、Full SFT、垂直领域 LoRA SFT、DPO 对齐。
-  \item \textbf{工程优化：}AMP 混合精度 + 梯度累积 + cosine LR 调度 + KV-Cache 推理加速。
-  \item \textbf{拓展实验：}复现 MoonshotAI 团队提出的 Attention Residuals，替换传统残差连接，结果显示训练稳定，loss 与 baseline 接近，深层 block 输出幅值增长更受控制，AttnRes 在深度上学会选择性读取历史层。
-\end{enumerate}
-
-\newpage
-\section{项目经历（续）}
-\projectheading{小模型 Tool Use / Function Calling 能力提升研究}{2026-05 $\sim$ 至今}
-\textbf{项目介绍：}工具调用是当前大语言模型落地应用的核心能力之一。然而受限于参数规模，小模型在工具调用任务上往往表现欠佳。本项目针对 Llama3.2-1B-Instruct 等小参数量模型在工具调用中常见的格式错误、工具误选、参数幻觉等痛点，基于 BFCL v4 评测框架，通过 Prompt 工程、SFT 及 RL 等手段，系统探索提升小模型工具调用能力（Single Turn、Hallucination Measurement）的有效路径。\par
-\textbf{项目工作：}
-\begin{enumerate}
-  \item \textbf{数据准备和处理：}
-    \begin{itemize}
-      \item 基于 xLAM-function-calling-60k 原始语料，分类采样以控制数据集配比（40/20/30/10）。工具描述格式、输出要求格式共 8 变体（python/json），防止模型仅记忆单一格式而减弱泛化能力。
-      \item 蒸馏高质量工具调用结果：以 DeepSeek-V4 为教师 A 生成推理链（<think>...</think>）与工具调用结果；以 MiniMax-m2.5 为教师 B 对推理链做蒸馏替换，对比不同教师模型在下游任务上的效益差异。
-      \item 实现带重试的清洗脚本，过滤多次格式错误样本，得到 SFT 数据集（DS 2k/5k/10k 与 MM 2k/5k/10k）。
-      \item 针对 irrelevance 场景利用大模型合成 300 条 no-call 负样本，覆盖无关工具、参数缺失、参数模糊／冲突、约束不支持四类子场景。
-    \end{itemize}
-  \item \textbf{SFT 消融实验：}
-    \begin{itemize}
-      \item 在 Llama 3.2-1B-Instruct 上完成七组主实验（DS 2k/5k/10k + MM 2k/5k/10k + baseline prompt-only），评测基于 BFCL v4 Single Turn、Hallucination Measurement 相关子集：Live、Non-Live。
-      \item 最佳结果：MiniMax-5k 取得 Non-Live Acc 68.6\%（baseline 38.4\%，\textbf{+30.2pp}），Live Acc 51.0\%（baseline 11.4\%，\textbf{+39.6pp}）；DeepSeek-2k 取得 Overall 13.81\%（baseline 10.1\%，\textbf{+3.71pp}）。
-    \end{itemize}
-  \item \textbf{Badcase 分析与改进：}
-    \begin{itemize}
-      \item 对 MiniMax-2k 模型进行系统性 Badcase 归类，应拒用却调用的幻觉情况占比最高。原因是 SFT 训练中全部为正调用样本。
-      \item MiniMax-2k 加入 300 条负样本后重训，Overall Irrelevance 从 3.48\% 提升至 53.58\%（\textbf{+50.1pp}），同时发现 trade-off（Live Acc 46.93\% $\rightarrow$ 40.04\%，Relevance Detection 100\% $\rightarrow$ 93.75\%），指明负样本比例消融实验是下一步方向。
-    \end{itemize}
-  \item \textbf{GRPO 训练：}
-    \begin{itemize}
-      \item 奖励函数设计：设计细粒度奖励函数：r\_format $\in$ [0,1]；r\_correcet = r\_name + r\_param + r\_value，归一化到 [-3,3]。
-      \item 实验设置：Llama3.2-1B-Instruct 能力有限，切换为 Qwen2.5-3B-Instruct 模型；TRL 框架，vLLM 推理生成 rollout；五组实验：GRPO1500-only、SFT400 cold start + GRPO1500、SFT400、SFT1900、baseline。
-      \item 主要实验结果：GRPO1500-only Non-Live 52.23\%，Live Acc 45.68\%；SFT400 + GRPO1500 Non-Live Acc 46.21\%，Live Acc 37.75\%；相比 baseline 均有所降低（61.67\%，51\%），SFT 组基本与 baseline 持平。分析原因主要来自数据集，后续可更换更高质量和多样性的数据集进行实验。
-    \end{itemize}
-\end{enumerate}
+\input{ddvla-ppo}
+\par\vspace{5pt}
+\input{tool-use}

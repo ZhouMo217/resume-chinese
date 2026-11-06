@@ -1,0 +1,16 @@
+% !TeX root = resume.tex
+% User scope: dataset download/conversion, ECoT synthesis/ablations,
+% and LIBERO/LIBERO-Plus/SimplerEnv integration and evaluation-speed optimization.
+% Report evidence: supplied 2610.37381v1.pdf, sections 2.4, 2.5.3 and table 13.
+% Report-wide method details are draft descriptions of the workstream, not a claim
+% that every component or the full corpus was implemented by the user alone.
+
+\projectheading{PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations}{2026.07\,--\,2026.10}
+{\color{SecondaryText}技术报告\,｜\,\href{https://arxiv.org/abs/2610.37381}{\textcolor{SecondaryText}{arXiv:2610.37381}}\,｜\,署名：Xu Jiang}\par
+\begin{experienceitems}
+  \item \textbf{数据获取与训练格式转换：}负责公开机器人与视觉语言数据的下载、整理和训练格式适配，参与统一不同来源的观测、状态、动作与任务描述，检查异常样本及图像--状态--动作对齐，为多源联合训练准备数据。
+  \item \textbf{ECoT 数据合成：}参与具身思维链（Embodied Chain-of-Thought）数据构建，按有效关键帧组织场景描述、任务进度判断和下一步动作描述；结合历史观测辅助进度判断，并依据记录的末端位姿与夹爪变化构造动作描述，生成可用于 VLA／VL 训练的标注样本。
+  \item \textbf{ECoT 消融实验：}开展无 ECoT 训练、ECoT 训练但推理不生成、ECoT 训练且推理生成三组对照。报告中不生成 ECoT 的训练方案使 LIBERO Long 成功率由 92.8\% 提升至 96.0\%，LIBERO-Plus Long 由 65.18\% 提升至 69.87\%；额外生成未带来一致收益，且 LIBERO-Plus 总体表现未超过基线，区分长任务收益与总体效果。
+  \item \textbf{Benchmark 接入与评测提速：}接入 LIBERO、LIBERO-Plus 和 SimplerEnv，适配策略推理与环境交互流程，运行并汇总任务评测；优化评测执行效率，支持模型版本比较和 ECoT 消融实验的迭代。
+\end{experienceitems}
+\draftnote{待补充：本人处理的数据集／规模、具体提速手段、相同配置下的优化前后耗时。}
