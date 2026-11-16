@@ -1,16 +1,17 @@
-% !TeX root = resume.tex
-% User scope: dataset download/conversion, ECoT synthesis/ablations,
-% and LIBERO/LIBERO-Plus/SimplerEnv integration and evaluation-speed optimization.
-% Report evidence: supplied 2610.37381v1.pdf, sections 2.4, 2.5.3 and table 13.
-% Report-wide method details are draft descriptions of the workstream, not a claim
-% that every component or the full corpus was implemented by the user alone.
+% Numbers (all from arXiv:2610.37381 report; verify against latest version):
+%   Four-benchmark finals: LIBERO 99.3 / LIBERO-Plus 89.9 / RoboTwin 2.0 93.6 / SimplerEnv 81.5 — best or tied-best among contemporaneous public methods.
+%   Data scale: 35+ public datasets, 4.35M VLA trajectories (~34K hours) + 31.68M VL samples.
+%   ECoT corpus: 2.56M annotated keyframes over 6 real-robot/UMI datasets (AgiBot World, ABC-130K, RoboCOIN, RoboMIND, HiFi-UMI-2K, FastUMI-100K).
+%   ECoT ablation (Table 13): LIBERO Long 92.8 (no ECoT) -> 96.0 (train-only) -> 95.6 (train+infer); LIBERO-Plus Long 65.18 -> 69.87 -> 68.72;
+%     LIBERO avg 97.1 -> 98.2; LIBERO-Plus overall 79.59 (no ECoT) vs 79.25 (train-only) vs 79.12 (train+infer).
+% To fill in: personal dataset scope; sim synthesis scale (tasks / trajectories / randomization dims);
+%   post-training gains on RoboTwin 2.0 & SimplerEnv vs pre-training-only start, if an A/B number exists.
 
 \projectheading{PDRVLA: A Vision-Language-Action Model with Physical Dynamics Representations}{2026.07\,--\,2026.10}
 {\color{SecondaryText}技术报告\,｜\,\href{https://arxiv.org/abs/2610.37381}{\textcolor{SecondaryText}{arXiv:2610.37381}}\,｜\,署名：Xu Jiang}\par
+\textbf{项目介绍：}PDRVLA 提出轻量级 Physical Dynamics Module，经冻结视频世界模型监督学习物理动力学表示，从视觉语言特征中提取未来 RGB／深度／光流特征 token 来条件化动作生成。训练数据依托 35+ 公开数据源与自动标注扩展，最终在 LIBERO／LIBERO-Plus／RoboTwin 2.0／SimplerEnv 四个 benchmark 上取得同期公开方法最优或并列最优。本人负责其中的训练数据侧工作：多源数据处理、subtask／ECoT／仿真数据合成与 ECoT 有效性消融验证。\par
 \begin{experienceitems}
-  \item \textbf{数据获取与训练格式转换：}负责公开机器人与视觉语言数据的下载、整理和训练格式适配，参与统一不同来源的观测、状态、动作与任务描述，检查异常样本及图像--状态--动作对齐，为多源联合训练准备数据。
-  \item \textbf{ECoT 数据合成：}参与具身思维链（Embodied Chain-of-Thought）数据构建，按有效关键帧组织场景描述、任务进度判断和下一步动作描述；结合历史观测辅助进度判断，并依据记录的末端位姿与夹爪变化构造动作描述，生成可用于 VLA／VL 训练的标注样本。
-  \item \textbf{ECoT 消融实验：}开展无 ECoT 训练、ECoT 训练但推理不生成、ECoT 训练且推理生成三组对照。报告中不生成 ECoT 的训练方案使 LIBERO Long 成功率由 92.8\% 提升至 96.0\%，LIBERO-Plus Long 由 65.18\% 提升至 69.87\%；额外生成未带来一致收益，且 LIBERO-Plus 总体表现未超过基线，区分长任务收益与总体效果。
-  \item \textbf{Benchmark 接入与评测提速：}接入 LIBERO、LIBERO-Plus 和 SimplerEnv，适配策略推理与环境交互流程，运行并汇总任务评测；优化评测执行效率，支持模型版本比较和 ECoT 消融实验的迭代。
+  \item \textbf{多源数据统一与格式适配：}参与 35+ 公开机器人／VL 数据源的统一管线搭建（累计 \textbf{4.35M} VLA 轨迹＋\textbf{31.68M} VL 样本），制定 EEF 位姿增量（平移 $\Delta p$＋旋转 $\Delta R$）与夹爪开度归一化的统一动作表示，统一坐标系与 robot／arm／hand 元数据；实现观测--状态--动作流按最低频率对齐与逐样本图像--状态--动作对齐校验，并统一视频编码（GOP$\leq$2）以支持训练时随机帧访问。
+  \item \textbf{Subtask／ECoT／仿真数据合成：}构建段级$\to$帧级两级同构标注管线：依据夹爪开合与 EEF 运动学事件将长轨迹切分为子任务段，自动生成（子任务描述，段内进度，段末动作描述）三元标注，零人工成本；段内按 image-hash 相似度选取有效关键帧，调用 Qwen 结合历史帧摘要生成场景描述，帧级 ECoT 复用与段级一致的位姿--文本映射规则并以段级进度为锚点，保证两级语义一致；管线覆盖 6 个真实机器人／UMI 数据集，产出约 \textbf{2.56M} 标注关键帧，同时生成 ECoT 嵌入式 VLA 轨迹与独立 VL 样本，支撑双目标联合训练。另在 RoboTwin 2.0 与 SimplerEnv 中脚本化实例化任务模板并随机化初始位姿与外观，采集带真值动作的成功轨迹并转换至统一动作格式，构建零标注成本的仿真平行数据用于后训练域适配。\textbf{[待补：仿真合成任务数／轨迹数与随机化维度]}
+  \item \textbf{ECoT 有效性消融：}设计无 ECoT 训练、ECoT 训练但推理不生成、ECoT 训练且推理生成三组对照。ECoT 训练但推理不生成使 LIBERO Long 由 \textbf{92.8\%$\to$96.0\%}、LIBERO-Plus Long 由 \textbf{65.18\%$\to$69.87\%}（LIBERO 平均 97.1\%$\to$98.2\%）；推理端额外生成未带来一致收益（LIBERO Long 退至 95.6\%，LIBERO-Plus 总体 79.12\% 低于无 ECoT 基线 79.59\%）。据此推动最终模型采用「ECoT 训练＋推理不生成」：长任务收益来自训练时的表示学习而非推理时逐步生成，同时避免推理端冗余 token 的额外时延。
 \end{experienceitems}
-\draftnote{待补充：本人处理的数据集／规模、具体提速手段、相同配置下的优化前后耗时。}

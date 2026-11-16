@@ -1,0 +1,11 @@
+% !TeX root = resume.tex
+% Approved 2026-11-09: S2D-OPD reproduction + Mass-Quota adaptive supervision.
+% Evidence: S2D-OPD-report.html and s2d_opd_mass_quota_experiment_report_20261106.html.
+
+\projectheading{面向数学推理的弱到强蒸馏与自适应监督优化}{2026.11}
+\textbf{项目介绍：}针对大模型强化学习成本高、缺乏更强教师提供监督的问题，研究将小模型 RL 前后的策略变化迁移至更强学生的方法。围绕 Direct-OPD 中低价值监督可能干扰训练的问题，复现 S\textsuperscript{2}D-OPD，并探索基于累计散度的自适应监督选择策略。\par
+\begin{experienceitems}
+  \item \textbf{蒸馏训练与论文复现：}以 JustRL-1.5B 及其 RL 前参考模型构成教师对，训练 Qwen3-1.7B 学生；在学生自身 rollout 的 top-16 候选上计算教师对数概率比和 JSD，结合选择性监督与学生初始化 KL 约束完成训练。在 8$\times$H200 上完成 Dense、JSD Top-10\%、Random-10\% 三组各 300 步对照，并对四个公开 checkpoint 开展 AIME24/25/26、两个 HMMT 数据集的 Avg@32 评测；复现 Top-10\% 的 AIME24/25 验证峰值 \textbf{52.76\%}，接近论文报告的 52.9\%。
+  \item \textbf{自适应监督策略设计：}针对固定 Top-10\% 无法适应不同回答中散度集中程度的问题，设计并实现 \textbf{Mass-Quota}：逐回答按 JSD 降序累计，选择达到目标散度覆盖率的最小位置集合，默认 50\% 的保留范围，并引入固定参考预算的 loss 归一化。实验中平均保留 \textbf{11.39\%} 的位置，覆盖 \textbf{50.07\%} 的累计 JSD 分数，将固定位置比例改为按散度分布动态分配监督数量。
+  \item \textbf{实验结果：}在 300 步最终 checkpoint 的 Avg@32 验证中，Mass-Quota 在 \textbf{AIME25 达到 44.27\%，位列四组第一}，较固定 Top-10\% 提升 \textbf{1.56 个百分点}、较 Dense 提升 \textbf{2.60 个百分点}；在 \textbf{AIME24 达到 58.33\%}，较 Dense 提升 \textbf{1.04 个百分点}。双基准平均达到 \textbf{51.30\%}，较 Dense 提升 \textbf{1.82 个百分点}，与固定 Top-10\% 持平，在保持双基准平均性能的同时，进一步提升 AIME25 数学推理表现。
+\end{experienceitems}

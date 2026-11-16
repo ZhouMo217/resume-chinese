@@ -1,12 +1,21 @@
 % !TeX root = resume.tex
-% Confirmed: intent classification optimization; JEV investigation; prompt self-evolution.
-% JEV expansion, training setup and evaluation results were not supplied.
-% Candidate implementation details below are visibly labeled as draft proposals.
+% Evidence reviewed 2026-11-16 from /mnt/workspace/data/jiangxu/jev: README (framework + 方法矩阵), 重构.md,
+% CLAUDE.md, src/jev/{methods,serve,eval}, src/evolve, src/calibration, configs/methods/*.json,
+% docs/汇总表格.md, docs/业务报告.md, docs/Logit后处理校准.md, results/intent_cls/*/summary.json,
+% results/intent_custom/*/summary.json, results/evolve/intent_custom/*/macro_summary.json.
+% 子意图 = intent_cls suite (9,278 rows) —— 简历不引用其 headline 口径，只写"与线上模型相当"（业务侧确认）。
+% 自定义意图 = intent_custom suite (33,251 rows)；金标为 GPT(user-only) 自动标注，数字是与该参考的一致率。
+% 不写吞吐/时延（2026-11-16 用户要求）；权重冻结，无权重训练。
+% 自定义意图 GLiDE 的 AB 上线为业务侧确认，仓库内无 AB 报告，故不写 AB 提升幅度。
+% See INTENT_RESEARCH_NOTES.md for per-number sources and caveats.
 
-\projectheading{意图分类模型优化与提示词自进化}{2026.10\,--\,2026.11}
+\projectheading{JoyInside 意图识别优化与提示词自进化}{2026.10\,--\,2026.11}
+\textbf{项目介绍：}JoyInside 是面向 AI 玩具、炒菜机、智能家居等场景的附身智能业务线，其用户意图识别体系由：主意图模型、联网意图模型、子意图模型（功能与指令类意图模型）、自定义意图模型以及仲裁模块组成。该项目探索了 JEV 决策模型在意图识别与分类上的优化与应用，搭建了统一的 JEV 模型服务、业务评测与优化框架。\par
 \begin{experienceitems}
-  \item \textbf{意图分类研究：}围绕业务意图识别任务开展模型优化，研究使用 JEV 进行意图分类，并探索在该方案上通过提示词自进化改善分类效果。
-  \item \textbf{优化流程草稿：}拟按“错误样本归类--提示词候选生成--固定验证集评估--保留有效版本”组织迭代，重点检查相近意图混淆、表达变化及类别边界；以独立测试集核验效果，避免只对少量案例调优。
-  \item \textbf{对照评测草稿：}拟对比初始提示词、人工调整与自动进化方案，记录准确率、Macro-F1、易混类别召回率及推理开销，评估分类收益和使用成本。
+  \item \textbf{评测与服务框架：}把 Reflex、GLiDE、sr-d3、KnowLine-31B 等决策模型接入统一框架：一条命令即可把任一方法拉起为多副本服务，评测侧接入子意图（9,278 条）与自定义意图（33,251 条）两套业务口径，统一汇总 Accuracy／Macro-Recall/Macro-Precision/Macro-F1／时延等指标，支持断点续跑、分片合并、结果对比。并在框架下适配提示词自进化与 logit 校准的意图分类优化方法。
+  \item \textbf{意图分类优化方法：}一是\textbf{提示词与意图定义自进化}，基于 GEPA 与 DSPy 构建“难例挖掘--反思改写--验证筛选--分组回归”闭环，冻结模型权重、只改意图的定义，按混淆意图分组分层抽样做多轮迭代优化，在留出集上评估；二是 \textbf{logit 后校准}，对比 bias、temperature+bias、vector、matrix 四类方案，用嵌套交叉验证在拟合集上选择校准参、在留出集上评估。
+  \item \textbf{主要结果：}GLIDE JEV 模型在 \textbf{子意图} 上初始准确率为 87.00\%，经提示词自进化后提升至 \textbf{89.24\%}，结合 logit 校准，进一步提升至 \textbf{90.23\%}，与线上通用模型效果相当；在 \textbf{自定义意图}（33,251 条）上优化后准确率达到 \textbf{90.63\%}，较线上基线 85.48\% 提升 \textbf{5.15} 个百分点，Macro-F1 由 66.25\% 提升到 \textbf{78.01\%}，现已上线进行 AB 实验。
 \end{experienceitems}
-\draftnote{待确认：JEV 全称／模型版本、上述流程的已完成部分；待补充：数据量、基线与最终指标。}
+
+% Keep the following project heading, introduction and first item on the same page.
+\par\Needspace{10\baselineskip}

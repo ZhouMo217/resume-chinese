@@ -1,11 +1,19 @@
 % !TeX root = resume.tex
-% Confirmed: ongoing DDVLA-PPO project using discrete diffusion and PPO.
-% No start date, base model, benchmark or result has been supplied.
+% Numbers (LIBERO-Spatial, 500 episodes per eval; eval noise ~ +-0.65 pp):
+%   SFT starts 84.1% (E0 5k) and 96.8% (E0 50k): 3-run means recorded in docs/notes/roadmap.md §1
+%   (local eval dirs kept: E0-sweep-spatial-5k 83.6, E0-5k-spatial-rep2 84.4, rep3 84.2, E0-50k-spatial-rep3 96.8).
+%   Weak-start PPO: 97.3% at 48 epochs (3-run mean), 99.8% at epoch 80 of the 96-epoch fp16 run (single eval;
+%   runs/eval/...-20261111-054323-step80).
+%   OpenVLA-OFT paper reports 97.6% on Spatial (different protocol: 220 vs 256 max steps).
+% Speedups: training 15.4 -> 7.2 min/epoch (A/B from the same checkpoint, 3 GPUs, same per-GPU load);
+% evaluation 15 -> 4 min per 500 episodes.
 
-\projectheading{DDVLA-PPO：基于离散扩散的 VLA 强化学习}{进行中}
+\projectheading{DDVLA-PPO：离散扩散视觉语言动作模型的在线强化学习}{2026.11\,--\,至今}
+\textbf{项目介绍：}目前 VLA 动作生成多采用 Flow Matching 方法，该方法下动作输出为固定路径的欧拉积分，难以计算动作概率而无法直接套用 PPO 方法。离散扩散 VLA（DDVLA）通过多步掩码去噪并行生成动作 token，动作概率易于求解。本项目以 OpenVLA-7B 为骨干，在 RLinf 框架上实现 DDVLA 的全参数 PPO 在线强化学习，在 LIBERO 机械臂仿真中提升操作成功率。\par
 \begin{experienceitems}
-  \item \textbf{研究方向：}探索将 PPO 强化学习用于离散扩散的视觉语言动作策略，在环境交互反馈下优化动作生成，研究离散去噪过程与策略更新的结合方式。
-  \item \textbf{实现规划草稿：}围绕动作表示与离散去噪采样，梳理策略概率的计算或估计方式、优势计算与 PPO 裁剪目标，明确训练和 rollout 阶段需要保留的中间信息，并检查训练稳定性。
-  \item \textbf{实验规划草稿：}以未进行 PPO 优化的策略为基线，比较不同去噪步数、奖励设置与更新强度，观察任务成功率、样本效率和推理延迟；具体实验组合按实际实现补充。
+  \item \textbf{训练框架实现：}在 LIBERO 四个任务集上联合 SFT 得到 DDVLA 起点（四任务集平均 \textbf{95.6\%}）；将策略接入 RLinf，参照 dVLA-RL 的路径级目标，把每个动作块 2 步去噪路径上 56 个新解码 token 的对数概率之和作为块级策略概率，结合共享骨干的价值头、GAE 与 Clip 裁剪目标，在 8$\times$H200 上用 FSDP 完成全参数 PPO 训练。
+  \item \textbf{训练稳定性诊断：}定位并解决两类数值问题：一是 bf16 主权重下 AdamW 的小步长更新被舍入吞掉，改为 fp32 主权重加混合精度；二是bf16 下 rollout 与训练端的对数概率舍入差异使 PPO ratio 的噪声底达到约 \textbf{0.3}，远超目标信任域、淹没了学习信号，改用 fp16 计算加梯度缩放后降至 \textbf{0.04}。设计按实测策略偏移自适应调整学习率的机制，避免固定学习率下更新幅度随价值估计变好而越出信任域。
+  \item \textbf{训练与评测提速：}分析每轮耗时构成，针对 rollout 中环境逐个串行重建、已结束的环境仍空转仿真与推理，以及训练时约 55\% 的动作槽位被掩码却照常前向反向等问题，实现并行重建环境、结束后跳过仿真与推理、只在有效槽位上训练（保持梯度归一化与更新次数不变），同起点对照下每轮训练耗时由 \textbf{15.4 分钟降至 7.2 分钟}（\textbf{2.15$\times$}），训练指标一致；评测侧实现同任务优先调度、空闲环境跳过与两段流水，单次 500 局评测由 15 分钟降至 \textbf{4 分钟}（\textbf{3.6$\times$}）。
+  \item \textbf{主要实验结果：}在 LIBERO-Spatial 上，作为对照的 50k SFT 成功率为 \textbf{96.8\%}；从少样本 5k SFT 起点（\textbf{84.1\%}）出发，PPO 训练 96 epoch 后正确率达到 \textbf{99.8\%}（+15.7 个百分点，epoch 80），从弱策略出发的 RL 后训练超过了直接做大预算 SFT 的效果，验证了方法的上限和有效性。
+  \item \textbf{额外实验：}OpenVLA 主干接入 GR00T Flow Matching 动作头，复现 ReinFlow PPO 方法，该方法在 Flow Matching 积分路径上引入高斯随机噪声，将去噪过程转化为带高斯转移的离散马尔可夫过程，使得动作对数概率累加可算，从而适配 PPO 路径级目标并支撑在线探索。该方法下从少样本 5k SFT起点（\textbf{82.7\%}），PPO 训练 64 epoch 后正确率达到 \textbf{99.6\%}。
 \end{experienceitems}
-\draftnote{待补充：起始时间、基座模型／代码框架、环境与当前进度、已完成实验和结果。}

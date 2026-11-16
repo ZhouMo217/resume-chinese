@@ -31,7 +31,9 @@
 % use xifthen
 \RequirePackage{xifthen}
 % use fontawesome
-\RequirePackage{fontawesome}
+\RequirePackage{fontawesome5}
+% Font Awesome 5 rename for the legacy FA3 icon used below.
+\newcommand{\faEnvelopeO}{\faEnvelope}
 % use xcolor for customizing color
 \RequirePackage{xcolor}
 

@@ -1,0 +1,15 @@
+% !TeX root = resume.tex
+% Draft 2026-11-12 from model_merge/benchmark (README.md §1-§5.3, results/v1-20261106/summary.md
+% and report_merge.md) and model_merge/mergekit (model_stock_merge.py, the per-method YAMLs,
+% diag_*.py) plus model_merge/details_bug/模型乱码问题解决过程.txt.
+% Numbers are the protocol-v1 paired results: base-fp8 / sft-v26-fp8 / merge-v26-fp8.
+
+\projectheading{JoyInside 业务 SFT 的通用能力评测与模型融合}{2026.11}
+\textbf{项目介绍：}陪伴聊天场景的业务 SFT 会损伤基座模型的通用能力，而业务侧只关心效果是否“够用”。本项目为 Qwen3-235B-A22B 建立可复现的横向评测，量化业务微调带来的退化位置，再用模型融合在保留业务能力的同时挽回通用能力。\par
+\begin{experienceitems}
+  \item \textbf{评测集接入与流程搭建：}接入 IFEval、MultiIF、MMLU-Redux/Pro、C-Eval、GPQA-Diamond、MATH-500、ZebraLogic、CSimpleQA、WritingBench 共 10 个评测集，覆盖指令遵循、多轮约束、中英知识、科学／数学／逻辑推理、事实性与写作；固定数据快照、样本清单、提示词与生成参数，基于 EvalScope 与 vLLM（TP4）实现可断点续跑的批量评测，单模型 8 项规则任务约 1 小时 40 分、覆盖率 100\%。
+  \item \textbf{退化量化：}在相同协议下对比基座 Instruct 与业务 SFT 的 FP8 线上版本，8 项规则任务全部显著退化（ZebraLogic $-31.4$pp、MultiIF 第 3 轮 $-8.6$pp、MATH-500 $-8.2$pp、GPQA $-6.8$pp、C-Eval $-5.1$pp、MMLU-Pro $-4.8$pp、IFEval $-4.3$pp、MMLU-Redux $-1.9$pp）；进一步按难度、轮次和语言分层，定位到退化随推理长度与难度、对话轮次增加而放大（MATH 4／5 级 $-10.6$／$-18.7$pp，ZebraLogic XL 由 73.5\% 降至 23.0\%），中文退化大于英文，且数学输出长度由 1,808 降到 759 token，区分了“能力退化”与“输出变短”。
+  \item \textbf{模型融合探索与实践：}针对多份业务 checkpoint，对齐 235B MoE 模型（36,945 个张量）的 key 与形状后，探索并实践 SLERP、TIES、DARE-TIES、DELLA、Task Arithmetic 与 Model Stock 等融合方案（mergekit 及按张量余弦相似度自适应插值系数的自实现脚本），最终采用基座＋两份业务 SFT 的三模型 Model Stock 融合；排查合并模型部署后乱码／复读的问题，定位到合并输出的配置字段与基座不一致（\texttt{num\_experts} 与 \texttt{num\_local\_experts} 等），修复后恢复可用。
+  \item \textbf{融合效果评估：}在同一协议与样本清单下对比三模型，融合相对业务 SFT 在 IFEval 上 $+3.4$pp（挽回 77\% 的差距、与基座无显著差异），知识类补回约一半（MMLU-Redux $+1.1$、MMLU-Pro $+2.7$、C-Eval $+2.1$），多轮与逻辑推理补回三到四成（MultiIF $+3.6$、ZebraLogic $+9.8$），GPQA $+2.2$（置信区间含 0），而 MATH-500 反而比业务 SFT 更差（85.6 对 88.9）；据此给出“融合可补指令与知识、推理仅部分恢复、数学受损”的结论，并按能力分别报告而不合成单一总分。
+\end{experienceitems}
+\draftnote{待核对：各融合方法中哪些由本人执行、哪些沿用团队已有产物；Model Stock 合并模型与 FP8 量化的归属；CSimpleQA／WritingBench 的裁判评测尚未完成；项目起止时间与在组内的角色。}
